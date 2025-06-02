@@ -1,74 +1,117 @@
-const FACTORES_CONVERSION = {
-    temperatura: { CtoK: 273.15, KtoC: 273.15 },
-    distancia: { metrosAPies: 3.28084, piesAMetros: 1 / 3.28084 },
-    volumen: { litrosAGalones: 0.264172, galonesALitros: 1 / 0.264172 },
-    masa: { kilosALibras: 2.20462, librasAKilos: 1 / 2.20462 }
-};
+const FACTORES = {
+    temperatura: {
+        opciones: ["Celsius a Kelvin", "Kelvin a Celsius"],
+        formulas: {
+        "Celsius a Kelvin": (v) => v + 273.15,
+        "Kelvin a Celsius": (v) => v - 273.15,
+        },
+        unidadFinal: {
+        "Celsius a Kelvin": "K",
+        "Kelvin a Celsius": "°C",
+        },
+    },
+    distancia: {
+        opciones: ["Metros a Pies", "Pies a Metros"],
+        formulas: {
+        "Metros a Pies": (v) => v * 3.28084,
+        "Pies a Metros": (v) => v / 3.28084,
+        },
+        unidadFinal: {
+        "Metros a Pies": "ft",
+        "Pies a Metros": "m",
+        },
+    },
+    volumen: {
+        opciones: ["Litros a Galones", "Galones a Litros"],
+        formulas: {
+        "Litros a Galones": (v) => v * 0.264172,
+        "Galones a Litros": (v) => v / 0.264172,
+        },
+        unidadFinal: {
+        "Litros a Galones": "gal",
+        "Galones a Litros": "l",
+        },
+    },
+    masa: {
+        opciones: ["Kilos a Libras", "Libras a Kilos"],
+        formulas: {
+        "Kilos a Libras": (v) => v * 2.20462,
+        "Libras a Kilos": (v) => v / 2.20462,
+        },
+        unidadFinal: {
+        "Kilos a Libras": "lb",
+        "Libras a Kilos": "kg",
+        },
+    },
+    };
 
-function conversion(valor, factor, operacion) {
-    if (operacion === "suma") return valor + factor;
-    if (operacion === "resta") return valor - factor;
-    if (operacion === "multiplicacion") return valor * factor;
-}
 
-let continuar = true;
+const tipo = document.getElementById("tipo");
+const unidad = document.getElementById("unidad");
+const valor = document.getElementById("valor");
+const form = document.getElementById("form-conversion");
+const resultado = document.getElementById("resultado");
+const historialLista = document.getElementById("historial");
 
-while (continuar) {
-    let tipo = prompt("¿Qué tipo de unidad quieres convertir?\nOpciones: temperatura, distancia, volumen, masa.").toLowerCase();
-    let valor, resultado;
 
-    switch (tipo) {
-        case "temperatura":
-            let unidadTemp = prompt("¿Vas a convertir Celsius o Kelvin? (C/K)").toUpperCase();
-            if (unidadTemp !== "C" && unidadTemp !== "K") {
-                alert("Unidad no válida para temperatura.");
-                break;
-            }
-            valor = Number(prompt(`Ingrese la temperatura en ${unidadTemp === "C" ? "Celsius" : "Kelvin"}`));
-            resultado = conversion(valor, FACTORES_CONVERSION.temperatura[unidadTemp === "C" ? "CtoK" : "KtoC"], unidadTemp === "C" ? "suma" : "resta");
-            alert(`Son ${resultado.toFixed(2)} ${unidadTemp === "C" ? "Kelvin" : "Celsius"}`);
-            break;
+    tipo.addEventListener("change", () => {
+    unidad.innerHTML = "";
+    FACTORES[tipo.value].opciones.forEach((opcion) => {
+        const opt = document.createElement("option");
+        opt.value = opcion;
+        opt.textContent = opcion;
+        unidad.appendChild(opt);
+    });
+    });
 
-        case "distancia":
-            let unidadDist = prompt("¿Vas a convertir Metros o Pies? (M/FT)").toUpperCase();
-            if (unidadDist !== "M" && unidadDist !== "FT") {
-                alert("Unidad no válida para distancia.");
-                break;
-            }
-            valor = Number(prompt(`Ingrese la distancia en ${unidadDist === "M" ? "Metros" : "Pies"}`));
-            resultado = conversion(valor, FACTORES_CONVERSION.distancia[unidadDist === "M" ? "metrosAPies" : "piesAMetros"], "multiplicacion");
-            alert(`Son ${resultado.toFixed(2)} ${unidadDist === "M" ? "Pies" : "Metros"}`);
-            break;
 
-        case "volumen":
-            let unidadVol = prompt("¿Vas a convertir Litros o Galones? (L/G)").toUpperCase();
-            if (unidadVol !== "L" && unidadVol !== "G") {
-                alert("Unidad no válida para volumen.");
-                break;
-            }
-            valor = Number(prompt(`Ingrese el volumen en ${unidadVol === "L" ? "Litros" : "Galones"}`));
-            resultado = conversion(valor, FACTORES_CONVERSION.volumen[unidadVol === "L" ? "litrosAGalones" : "galonesALitros"], "multiplicacion");
-            alert(`Son ${resultado.toFixed(2)} ${unidadVol === "L" ? "Galones" : "Litros"}`);
-            break;
+tipo.dispatchEvent(new Event("change"));
 
-        case "masa":
-            let unidadMasa = prompt("¿Vas a convertir Kilos o Libras? (KG/LB)").toUpperCase();
-            if (unidadMasa !== "KG" && unidadMasa !== "LB") {
-                alert("Unidad no válida para masa.");
-                break;
-            }
-            valor = Number(prompt(`Ingrese la masa en ${unidadMasa === "KG" ? "Kilos" : "Libras"}`));
-            resultado = conversion(valor, FACTORES_CONVERSION.masa[unidadMasa === "KG" ? "kilosALibras" : "librasAKilos"], "multiplicacion");
-            alert(`Son ${resultado.toFixed(2)} ${unidadMasa === "KG" ? "Libras" : "Kilos"}`);
-            break;
 
-        default:
-            alert("Tipo de unidad no válido. Por favor, elige entre temperatura, distancia, volumen o masa.");
-            break;
+    form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const categoria = tipo.value;
+    const conversionElegida = unidad.value;
+    const numero = parseFloat(valor.value);
+
+    if (isNaN(numero)) {
+        resultado.textContent = "Por favor, ingresá un número válido.";
+        return;
     }
 
-    continuar = confirm("¿Quieres realizar otra conversión?");
-}
+    const resultadoFinal = FACTORES[categoria].formulas[conversionElegida](numero);
+    const unidadDestino = FACTORES[categoria].unidadFinal[conversionElegida];
 
-alert("Gracias por usar el simulador de conversión.");
+    resultado.textContent = `${numero} convertido con "${conversionElegida}" es ${resultadoFinal.toFixed(2)} ${unidadDestino}`;
 
+    guardarEnHistorial({
+        tipo: categoria,
+        conversion: conversionElegida,
+        valorOriginal: numero,
+        resultado: resultadoFinal.toFixed(2),
+        unidadDestino,
+    });
+
+    mostrarHistorial();
+    });
+
+
+    function guardarEnHistorial(entry) {
+    const historial = JSON.parse(localStorage.getItem("conversiones")) || [];
+    historial.push(entry);
+    localStorage.setItem("conversiones", JSON.stringify(historial));
+    }
+
+
+    function mostrarHistorial() {
+    historialLista.innerHTML = "";
+    const historial = JSON.parse(localStorage.getItem("conversiones")) || [];
+    historial.forEach((item) => {
+        const li = document.createElement("li");
+        li.textContent = `${item.valorOriginal} → ${item.resultado} ${item.unidadDestino} (${item.conversion})`;
+        historialLista.appendChild(li);
+    });
+    }
+
+
+mostrarHistorial();
