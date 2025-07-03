@@ -1,0 +1,46 @@
+    {
+    "temperatura": {
+        "opciones": ["Celsius a Kelvin", "Kelvin a Celsius"],
+        "formulas": {
+        "Celsius a Kelvin": "(v) => v + 273.15",
+        "Kelvin a Celsius": "(v) => v - 273.15"
+        },
+        "unidadFinal": {
+        "Celsius a Kelvin": "K",
+        "Kelvin a Celsius": "°C"
+        }
+    },
+    "distancia": {
+        "opciones": ["Metros a Pies", "Pies a Metros"],
+        "formulas": {
+        "Metros a Pies": "(v) => v * 3.28084",
+        "Pies a Metros": "(v) => v / 3.28084"
+        },
+        "unidadFinal": {
+        "Metros a Pies": "ft",
+        "Pies a Metros": "m"
+        }
+    },
+    "volumen": {
+        "opciones": ["Litros a Galones", "Galones a Litros"],
+        "formulas": {
+        "Litros a Galones": "(v) => v * 0.264172",
+        "Galones a Litros": "(v) => v / 0.264172"
+        },
+        "unidadFinal": {
+        "Litros a Galones": "gal",
+        "Galones a Litros": "l"
+        }
+    },
+    "masa": {
+        "opciones": ["Kilos a Libras", "Libras a Kilos"],
+        "formulas": {
+        "Kilos a Libras": "(v) => v * 2.20462",
+        "Libras a Kilos": "(v) => v / 2.20462"
+        },
+        "unidadFinal": {
+        "Kilos a Libras": "lb",
+        "Libras a Kilos": "kg"
+        }
+    }
+    }

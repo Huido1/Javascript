@@ -7,24 +7,19 @@
     <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-    <h1>Conversor de Unidades</h1>
+    <h1>Convertidor de Unidades</h1>
 
     <form id="form-conversion">
-    <label for="tipo">Tipo de unidad:</label>
-    <select id="tipo">
-        <option value="temperatura">Temperatura</option>
-        <option value="distancia">Distancia</option>
-        <option value="volumen">Volumen</option>
-        <option value="masa">Masa</option>
-    </select>
+        <label for="tipo">Tipo de unidad:</label>
+        <select id="tipo"></select>
 
-    <label for="unidad">Unidad a convertir:</label>
-    <select id="unidad"></select>
+        <label for="unidad">Unidad a convertir:</label>
+        <select id="unidad"></select>
 
-    <label for="valor">Valor a convertir:</label>
-    <input type="number" id="valor" required />
+        <label for="valor">Valor a convertir:</label>
+        <input type="number" id="valor" required />
 
-    <button type="submit">Convertir</button>
+        <button type="submit">Convertir</button>
     </form>
 
     <h2>Resultado:</h2>
@@ -33,6 +28,7 @@
     <h2>Historial de conversiones</h2>
     <ul id="historial"></ul>
 
+    <script src="lib/sweetalert2.all.min.js"></script>
     <script src="javascript/entrega.js"></script>
 </body>
 </html>

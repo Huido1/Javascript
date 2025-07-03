@@ -1,117 +1,76 @@
-const FACTORES = {
-    temperatura: {
-        opciones: ["Celsius a Kelvin", "Kelvin a Celsius"],
-        formulas: {
-        "Celsius a Kelvin": (v) => v + 273.15,
-        "Kelvin a Celsius": (v) => v - 273.15,
-        },
-        unidadFinal: {
-        "Celsius a Kelvin": "K",
-        "Kelvin a Celsius": "°C",
-        },
-    },
-    distancia: {
-        opciones: ["Metros a Pies", "Pies a Metros"],
-        formulas: {
-        "Metros a Pies": (v) => v * 3.28084,
-        "Pies a Metros": (v) => v / 3.28084,
-        },
-        unidadFinal: {
-        "Metros a Pies": "ft",
-        "Pies a Metros": "m",
-        },
-    },
-    volumen: {
-        opciones: ["Litros a Galones", "Galones a Litros"],
-        formulas: {
-        "Litros a Galones": (v) => v * 0.264172,
-        "Galones a Litros": (v) => v / 0.264172,
-        },
-        unidadFinal: {
-        "Litros a Galones": "gal",
-        "Galones a Litros": "l",
-        },
-    },
-    masa: {
-        opciones: ["Kilos a Libras", "Libras a Kilos"],
-        formulas: {
-        "Kilos a Libras": (v) => v * 2.20462,
-        "Libras a Kilos": (v) => v / 2.20462,
-        },
-        unidadFinal: {
-        "Kilos a Libras": "lb",
-        "Libras a Kilos": "kg",
-        },
-    },
-    };
+    document.addEventListener("DOMContentLoaded", initApp);
 
+    async function initApp() {
+    const tipoEl = document.getElementById("tipo");
+    const unidadEl = document.getElementById("unidad");
+    const valorEl = document.getElementById("valor");
+    const formEl = document.getElementById("form-conversion");
+    const resultadoEl = document.getElementById("resultado");
+    const historialEl = document.getElementById("historial");
 
-const tipo = document.getElementById("tipo");
-const unidad = document.getElementById("unidad");
-const valor = document.getElementById("valor");
-const form = document.getElementById("form-conversion");
-const resultado = document.getElementById("resultado");
-const historialLista = document.getElementById("historial");
+    const datos = await fetch("javascript/datos.json").then(res => res.json());
 
-
-    tipo.addEventListener("change", () => {
-    unidad.innerHTML = "";
-    FACTORES[tipo.value].opciones.forEach((opcion) => {
+    Object.keys(datos).forEach(tipo => {
         const opt = document.createElement("option");
-        opt.value = opcion;
-        opt.textContent = opcion;
-        unidad.appendChild(opt);
-    });
-    });
-
-
-tipo.dispatchEvent(new Event("change"));
-
-
-    form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const categoria = tipo.value;
-    const conversionElegida = unidad.value;
-    const numero = parseFloat(valor.value);
-
-    if (isNaN(numero)) {
-        resultado.textContent = "Por favor, ingresá un número válido.";
-        return;
-    }
-
-    const resultadoFinal = FACTORES[categoria].formulas[conversionElegida](numero);
-    const unidadDestino = FACTORES[categoria].unidadFinal[conversionElegida];
-
-    resultado.textContent = `${numero} convertido con "${conversionElegida}" es ${resultadoFinal.toFixed(2)} ${unidadDestino}`;
-
-    guardarEnHistorial({
-        tipo: categoria,
-        conversion: conversionElegida,
-        valorOriginal: numero,
-        resultado: resultadoFinal.toFixed(2),
-        unidadDestino,
+        opt.value = tipo;
+        opt.textContent = tipo.charAt(0).toUpperCase() + tipo.slice(1);
+        tipoEl.appendChild(opt);
     });
 
+    tipoEl.addEventListener("change", () => {
+        unidadEl.innerHTML = "";
+        datos[tipoEl.value].opciones.forEach(op => {
+        const option = document.createElement("option");
+        option.value = op;
+        option.textContent = op;
+        unidadEl.appendChild(option);
+        });
+    });
+
+    tipoEl.dispatchEvent(new Event("change"));
     mostrarHistorial();
+
+    formEl.addEventListener("submit", (e) => {
+        e.preventDefault();
+        convertir();
     });
 
+    function convertir() {
+        const tipo = tipoEl.value;
+        const operacion = unidadEl.value;
+        const valor = parseFloat(valorEl.value);
 
-    function guardarEnHistorial(entry) {
-    const historial = JSON.parse(localStorage.getItem("conversiones")) || [];
-    historial.push(entry);
-    localStorage.setItem("conversiones", JSON.stringify(historial));
+        if (isNaN(valor)) {
+        Swal.fire("Error", "Ingresá un número válido.", "warning");
+        return;
+        }
+
+        const formula = eval(datos[tipo].formulas[operacion]);
+        const resultado = formula(valor).toFixed(2);
+        const unidadDestino = datos[tipo].unidadFinal[operacion];
+
+        resultadoEl.textContent = `${valor} → ${resultado} ${unidadDestino}`;
+
+        Swal.fire("Conversión exitosa", `${valor} → ${resultado} ${unidadDestino}`, "success");
+
+        guardarHistorial({ tipo, operacion, valor, resultado, unidadDestino });
+        mostrarHistorial();
+        valorEl.value = "";
     }
 
+    function guardarHistorial(entry) {
+        const historial = JSON.parse(localStorage.getItem("conversiones")) || [];
+        historial.push(entry);
+        localStorage.setItem("conversiones", JSON.stringify(historial));
+    }
 
     function mostrarHistorial() {
-    historialLista.innerHTML = "";
-    const historial = JSON.parse(localStorage.getItem("conversiones")) || [];
-    historial.forEach((item) => {
+        historialEl.innerHTML = "";
+        const historial = JSON.parse(localStorage.getItem("conversiones")) || [];
+        historial.forEach(item => {
         const li = document.createElement("li");
-        li.textContent = `${item.valorOriginal} → ${item.resultado} ${item.unidadDestino} (${item.conversion})`;
-        historialLista.appendChild(li);
-    });
+        li.textContent = `${item.valor} → ${item.resultado} ${item.unidadDestino} (${item.operacion})`;
+        historialEl.appendChild(li);
+        });
     }
-
-
-mostrarHistorial();
+    }
